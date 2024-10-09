@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Task</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <img th:src="@{/images/Impact.png}" class="logo" alt="Impact Logo">
+
+    <div class="navbar-menu">
+        <a href="/tasks" class="navbar-item">Home</a>
+        <a href="/analytics" class="navbar-item">Analytics</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Edit Task</h1>
+
+    <form th:action="@{/tasks/update/{id}(id=${task.id})}" th:object="${task}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div th:if="${#fields.hasErrors()}" class="error-messages">
+            <p>Please correct the errors below:</p>
+            <ul>
+                <li th:each="err : ${#fields.allErrors()}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <!-- Task Name -->
+        <div class="form-group">
+            <label for="name">Task Name:</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Enter task name" required/>
+        </div>
+
+        <!-- Task Description -->
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" th:field="*{description}" placeholder="Enter task description"></textarea>
+        </div>
+
+        <!-- Task Status -->
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" th:field="*{status}">
+                <option value="Not Started" th:selected="${task.status == 'Not Started'}">Not Started</option>
+                <option value="In Progress" th:selected="${task.status == 'In Progress'}">In Progress</option>
+                <option value="Completed" th:selected="${task.status == 'Completed'}">Completed</option>
+                <option value="On Hold" th:selected="${task.status == 'On Hold'}">On Hold</option>
+            </select>
+        </div>
+
+        <!-- update buttons -->
+        <div>
+            <button type="submit" class="btn edit-btn">Save Changes</button>
+            <a href="/tasks" class="btn delete-btn">Cancel</a>
+        </div>
+    </form>
+
+</div>
+
+
+</body>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>&copy; 2024 Impact To-Do List. All rights reserved.</p>
+</footer>
+
+</html>
