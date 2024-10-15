@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics Report</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 2.5rem;
+            color: #222;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Modern form styles */
+        .form-container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-container label {
+            font-size: 1.1rem;
+            color: #444;
+        }
+        .form-container input[type="datetime-local"] {
+            padding: 12px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            color: #444;
+            transition: border-color 0.3s ease;
+        }
+        .form-container input[type="datetime-local"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .form-container button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ff0000, #ff4343);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+        .form-container button:hover {
+            background: linear-gradient(135deg, #0a0a0a, #0a0a0a);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Stats container */
+        .stats {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .stats:hover {
+            transform: translateY(-5px);
+        }
+        .stats h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ff4343;
+            font-weight: 500;
+        }
+        .stats ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .stats li {
+            padding: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+        .stats li:last-child {
+            border-bottom: none;
+        }
+        .stats li strong {
+            font-weight: 600;
+            color: #333;
+        }
+        .stats li span {
+            font-size: 1.2rem;
+            color: #ff3737;
+        }
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+            .stats ul {
+                gap: 10px;
+            }
+            .form-container button,
+            .form-container input[type="datetime-local"] {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <img src="../images/Impact.png" class="logo" alt="Impact Logo">
+    <div class="navbar-menu">
+        <a href="/tasks" class="navbar-item">Home</a>
+        <a href="/analytics" class="navbar-item">Analytics</a>
+    </div>
+</nav>
+
+<h1>Analytics Report</h1>
+
+<div class="container">
+    <!-- Form to select dates -->
+    <div class="form-container">
+        <form action="/analytics" method="get">
+            <label for="startDateInput">Start Date:</label>
+            <input type="datetime-local" id="startDateInput" name="startDate" required>
+
+            <label for="endDateInput">End Date:</label>
+            <input type="datetime-local" id="endDateInput" name="endDate" required>
+
+            <button type="submit">Generate Report</button>
+        </form>
+    </div>
+
+    <!-- Stats section -->
+    <div class="stats">
+        <h2 id="period">
+            Period:
+            <span id="formattedStartDate" th:text="${formattedStartDate}"></span>
+            to
+            <span id="formattedEndDate" th:text="${formattedEndDate}"></span>
+        </h2>
+
+        <ul>
+            <li><strong>Tasks Created:</strong> <span th:text="${createdCount}"></span></li>
+            <li><strong>Tasks Completed:</strong> <span th:text="${completedCount}"></span></li>
+            <li><strong>Tasks Not Started:</strong> <span th:text="${notStartedCount}"></span></li>
+            <li><strong>Tasks In Progress:</strong> <span th:text="${inProgressCount}"></span></li>
+            <li><strong>Tasks On Hold:</strong> <span th:text="${onHoldCount}"></span></li>
+        </ul>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2024 Impact To-Do List. All rights reserved.</p>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const startDateSpan = document.getElementById('formattedStartDate');
+        const endDateSpan = document.getElementById('formattedEndDate');
+
+        // Function to format the date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-CA', options); // 'en-CA' for YYYY-MM-DD format
+        }
+
+        // Update the spans with formatted dates
+        startDateSpan.textContent = formatDate(startDateSpan.textContent);
+        endDateSpan.textContent = formatDate(endDateSpan.textContent);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact To-Do List Web App</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <img src="../images/Impact.png" class="logo" alt="Impact Logo">
+    <div class="navbar-menu">
+        <a href="#" class="navbar-item">Home</a>
+        <a href="/analytics" class="navbar-item">Analytics</a>
+    </div>
+</nav>
+
+<!-- Body Container -->
+<div class="container">
+    <!-- Task Form -->
+    <div class="task-form">
+        <h2>Add New Task</h2>
+        <form th:action="@{/tasks/add}" method="post">
+            <div class="form-group">
+                <label for="taskName">Task Name</label>
+                <input type="text" id="taskName" name="name" placeholder="Enter task name" required>
+            </div>
+            <div class="form-group">
+                <label for="taskDescription">Description</label>
+                <textarea id="taskDescription" name="description" rows="3" placeholder="Enter task description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="taskStatus">Status</label>
+                <select id="taskStatus" name="status" required>
+                    <option value="" disabled selected>Select status</option>
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="On Hold">On Hold</option>
+                </select>
+            </div>
+            <button type="submit" class="btn add-btn">Add Task</button>
+        </form>
+    </div>
+
+    <!-- To-Do List Display -->
+    <div class="todo-list">
+        <h2>My To-Do List</h2>
+        <table class="task-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Status</th>
+                <th>Completed At</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Populate the list -->
+            <tr th:each="task : ${tasks}">
+                <td data-label="Name" th:text="${task.name}"></td>
+
+                <td data-label="Description" th:text="${task.description}"></td>
+                <td data-label="Created At" th:text="${#temporals.format(task.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td data-label="Status">
+                    <form th:action="@{/tasks/update-status}" method="post" class="status-form">
+                        <input type="hidden" name="id" th:value="${task.id}">
+                        <select name="status" onchange="this.form.submit()">
+                            <option value="Not Started" th:selected="${task.status == 'Not Started'}">Not Started</option>
+                            <option value="In Progress" th:selected="${task.status == 'In Progress'}">In Progress</option>
+                            <option value="Completed" th:selected="${task.status == 'Completed'}">Completed</option>
+                            <option value="On Hold" th:selected="${task.status == 'On Hold'}">On Hold</option>
+                        </select>
+                    </form>
+                </td>
+                <td data-label="Completed At" th:if="${task.completedAt != null}" th:text="${#temporals.format(task.completedAt, 'yyyy-MM-dd HH:mm')}">NA</td>
+                <td data-label="Completed At" th:if="${task.completedAt == null}">NA</td>
+                <td data-label="Actions">
+
+                    <a th:href="@{/tasks/edit/{id}(id=${task.id})}" class="btn edit-btn">Edit</a>
+
+
+
+                    <form th:action="@{/tasks/delete}" method="post" class="delete-form" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${task.id}">
+                        <button type="submit" class="btn delete-btn">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2024 Impact To-Do List. All rights reserved.</p>
+</footer>
+</body>
+</html>
