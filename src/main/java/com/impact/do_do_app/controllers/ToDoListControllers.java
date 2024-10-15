@@ -87,7 +87,6 @@ public class ToDoListControllers {
         return "redirect:/tasks";
     }
 
-
     @PostMapping("/delete")
     public String deleteTask(@RequestParam Long id) {
 
